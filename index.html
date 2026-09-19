@@ -76,7 +76,7 @@
   <legend>病人</legend>
   <div class="row">
     <input type="text" id="name" class="w-name" placeholder="姓名（可用王○○）">
-    <input type="text" id="pid" class="w-full" placeholder="ID（病歷號或身分證）" autocomplete="off">
+    <input type="text" id="pid" class="w-full" placeholder="身分證號碼" autocomplete="off">
     <input type="number" id="age" class="w-age" placeholder="年齡" inputmode="numeric">
     <div class="chips" style="margin:0">
       <button class="chip" data-group="sex" data-single="1" aria-pressed="false">男</button>
@@ -190,6 +190,11 @@
     <button class="chip" aria-pressed="false">心臟手術</button>
   </div>
   <div class="row"><input type="text" id="hx_other" class="w-full" placeholder="其他病史"></div>
+  <p class="hint">有用 SGLT-2 抑制劑</p>
+  <div class="chips">
+    <button class="chip danger" data-group="sglt2" data-single="1" aria-pressed="false">有</button>
+    <button class="chip" data-group="sglt2" data-single="1" aria-pressed="false">無</button>
+  </div>
 </fieldset>
 
 <fieldset>
@@ -253,6 +258,7 @@ function collect(){
     抗凝血藥物: pressed('ac')[0]||'',
     抗凝血藥物品項: pressed('ac')[0]==='有' ? [...pressed('acdrug'), $('ac_other').value].filter(Boolean).join('、') : '',
     病史: [...pressed('hx'), $('hx_other').value].filter(Boolean).join('、'),
+    SGLT2抑制劑: pressed('sglt2')[0]||'',
     已上傳: pressed('up').join('、')
   };
 }
@@ -271,6 +277,7 @@ function message(d){
   L.push(`Lactate ${d.Lactate||'—'}`);
   L.push(`處置 ${d.處置?d.處置.split('、').map(x=>'☑'+x).join(' '):'—'}`);
   L.push(`抗凝血藥物 ${d.抗凝血藥物?'☑'+d.抗凝血藥物:'—'}${d.抗凝血藥物品項?'：'+d.抗凝血藥物品項:''}`);
+  L.push(`SGLT-2抑制劑 ${d.SGLT2抑制劑?'☑'+d.SGLT2抑制劑:'—'}`);
   L.push(`病史 ${d.病史?d.病史.split('、').map(x=>'☑'+x).join(' '):'—'}`);
   L.push(`已上傳 ${d.已上傳?d.已上傳.split('、').map(x=>'☑'+x).join(' '):'—'}`);
   L.push(`通報 ${d.通報時間}`);
