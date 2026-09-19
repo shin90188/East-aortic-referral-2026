@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>花東主動脈剝離轉診通報</title>
+<style>
+  :root{
+    --ink:#14212b; --muted:#5b6b78; --line:#d6dde3; --bg:#ffffff;
+    --field:#f3f6f8; --teal:#0b6e7a; --teal-ink:#ffffff; --alert:#b3261e; --ok:#1e7a46;
+  }
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#e8eef2;--muted:#9fb0bb;--line:#3a4753;--bg:#141b21;--field:#1f2830;--teal:#3fb0bd}
+    :root:not([data-theme="light"]) .chip{background:#1f2830}:root:not([data-theme="light"]) .bar{background:#141b21}}
+  :root[data-theme="dark"]{--ink:#e8eef2;--muted:#9fb0bb;--line:#3a4753;--bg:#141b21;--field:#1f2830;--teal:#3fb0bd}
+  :root[data-theme="dark"] .chip{background:#1f2830}:root[data-theme="dark"] .bar{background:#141b21}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;font-size:17px;line-height:1.4}
+  header{padding:18px 16px 10px;border-bottom:3px solid var(--teal)}
+  header h1{margin:0;font-size:20px;font-weight:700;letter-spacing:.02em}
+  header p{margin:4px 0 0;font-size:14px;color:var(--muted)}
+  main{padding:0 16px 140px;max-width:560px;margin:0 auto}
+  fieldset{border:0;padding:14px 0 6px;margin:0;border-bottom:1px solid var(--line)}
+  legend{font-weight:700;font-size:16px;padding:0;margin-bottom:8px;color:var(--teal)}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+  .row label{font-size:14px;color:var(--muted);min-width:0}
+  input[type=text],input[type=number],input[type=time],input[type=datetime-local],select{
+    font:inherit;font-size:17px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;
+    background:var(--field);color:var(--ink);min-width:0}
+  input:focus,select:focus{outline:3px solid #9fd3da;border-color:var(--teal)}
+  .w-name{flex:2 1 120px}.w-age{width:82px}.w-num{width:84px}.w-full{flex:1 1 100%}.w-half{flex:1 1 45%}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+  .chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:9px 14px;font:inherit;font-size:16px;
+    color:var(--ink);cursor:pointer;-webkit-tap-highlight-color:transparent;min-height:44px}
+  .chip[aria-pressed=true]{background:var(--teal);color:var(--teal-ink);border-color:var(--teal)}
+  .chip[aria-pressed=true]::before{content:"✓ ";font-weight:700}
+  .chip.danger[aria-pressed=true]{background:var(--alert);border-color:var(--alert)}
+  .inline{display:flex;gap:8px;align-items:center}
+  .gcs{display:flex;gap:6px;align-items:center}.gcs input{width:52px;text-align:center}
+  .gcs span{font-size:14px;color:var(--muted)}
+  .hint{font-size:13px;color:var(--muted);margin:-2px 0 8px}
+  #preview{width:100%;font:inherit;font-size:15px;line-height:1.45;padding:12px;border:1px solid var(--line);
+    border-radius:8px;background:var(--field);min-height:200px;white-space:pre-wrap;resize:vertical}
+  .bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+    padding:10px 16px calc(10px + env(safe-area-inset-bottom));display:flex;gap:10px;max-width:560px;margin:0 auto}
+  .btn{flex:1;font:inherit;font-size:17px;font-weight:700;padding:14px;border-radius:10px;border:0;cursor:pointer;min-height:52px}
+  .btn.primary{background:#06c755;color:#fff}
+  .btn.secondary{background:var(--field);color:var(--ink);border:1px solid var(--line)}
+  .btn:focus{outline:3px solid #9fd3da}
+  #status{font-size:14px;margin:8px 0 0;min-height:20px}
+  #status.ok{color:var(--ok)}#status.err{color:var(--alert)}
+  @media (prefers-reduced-motion:no-preference){.chip{transition:background .12s,color .12s}}
+</style>
+</head>
+<body>
+<header>
+  <h1>花東主動脈剝離轉診通報</h1>
+  <p>點選項目後按「複製訊息」，再到 LINE 群組貼上</p>
+</header>
+
+<main>
+<fieldset>
+  <legend>轉出醫院</legend>
+  <div class="row">
+    <select id="hospital" class="w-half">
+      <option value="">選擇醫院</option>
+      <option>花蓮慈濟</option><option>花蓮門諾</option><option>部立花蓮</option><option>部立玉里</option>
+      <option>台東馬偕</option><option>部立台東</option><option>台東基督教</option><option>關山慈濟</option><option>玉里慈濟</option>
+      <option>其他</option>
+    </select>
+    <input type="text" id="reporter" class="w-half" placeholder="通報醫師／電話">
+  </div>
+</fieldset>
+
+<fieldset>
+  <legend>病人</legend>
+  <div class="row">
+    <input type="text" id="name" class="w-name" placeholder="姓名（可用王○○）">
+    <input type="text" id="pid" class="w-full" placeholder="ID（病歷號或身分證）" autocomplete="off">
+    <input type="number" id="age" class="w-age" placeholder="年齡" inputmode="numeric">
+    <div class="chips" style="margin:0">
+      <button class="chip" data-group="sex" data-single="1" aria-pressed="false">男</button>
+      <button class="chip" data-group="sex" data-single="1" aria-pressed="false">女</button>
+    </div>
+  </div>
+</fieldset>
+
+<fieldset>
+  <legend>時間</legend>
+  <div class="row"><label class="w-full">症狀發生</label><input type="datetime-local" id="t_onset" class="w-full"></div>
+  <div class="row"><label class="w-full">到院</label><input type="datetime-local" id="t_arrive" class="w-full"></div>
+  <div class="row"><label class="w-full">CTA 完成</label><input type="time" id="t_cta" class="w-half"></div>
+</fieldset>
+
+<fieldset>
+  <legend>主訴</legend>
+  <div class="chips" data-group="cc">
+    <button class="chip" aria-pressed="false">胸痛</button><button class="chip" aria-pressed="false">背痛</button>
+    <button class="chip" aria-pressed="false">腹痛</button><button class="chip" aria-pressed="false">昏厥</button>
+  </div>
+  <div class="row"><input type="text" id="cc_other" class="w-full" placeholder="其他主訴"></div>
+</fieldset>
+
+<fieldset>
+  <legend>意識</legend>
+  <div class="chips">
+    <button class="chip" data-group="conscious" data-single="1" aria-pressed="false">清醒</button>
+    <button class="chip" data-group="conscious" data-single="1" aria-pressed="false">混亂</button>
+    <button class="chip danger" data-group="conscious" data-single="1" aria-pressed="false">昏迷</button>
+    <button class="chip danger" data-group="intub" aria-pressed="false">已插管</button>
+  </div>
+  <div class="gcs">
+    <span>GCS</span>
+    <span>E</span><input type="number" id="gcs_e" min="1" max="4" inputmode="numeric">
+    <span>V</span><input type="number" id="gcs_v" min="1" max="5" inputmode="numeric">
+    <span>M</span><input type="number" id="gcs_m" min="1" max="6" inputmode="numeric">
+  </div>
+</fieldset>
+
+<fieldset>
+  <legend>生命徵象</legend>
+  <div class="row">
+    <label>BP</label><input type="number" id="sbp" class="w-num" placeholder="收縮" inputmode="numeric">/<input type="number" id="dbp" class="w-num" placeholder="舒張" inputmode="numeric">
+  </div>
+  <div class="row">
+    <label>HR</label><input type="number" id="hr" class="w-num" inputmode="numeric">
+    <label>SpO2</label><input type="number" id="spo2" class="w-num" inputmode="numeric"><label>%</label>
+  </div>
+  <div class="chips"><button class="chip" data-group="bpdiff" aria-pressed="false">雙側血壓不同</button></div>
+</fieldset>
+
+<fieldset>
+  <legend>CTA</legend>
+  <div class="chips">
+    <button class="chip danger" data-group="type" data-single="1" aria-pressed="false">Type A</button>
+    <button class="chip" data-group="type" data-single="1" aria-pressed="false">Type B</button>
+    <button class="chip" data-group="type" data-single="1" aria-pressed="false">不確定</button>
+  </div>
+  <p class="hint">Hemopericardium</p>
+  <div class="chips">
+    <button class="chip danger" data-group="hemo" data-single="1" aria-pressed="false">有</button>
+    <button class="chip" data-group="hemo" data-single="1" aria-pressed="false">無</button>
+  </div>
+</fieldset>
+
+<fieldset>
+  <legend>灌流不良</legend>
+  <div class="chips" data-group="malp">
+    <button class="chip" data-group="malp_none" aria-pressed="false">無</button>
+    <button class="chip danger" aria-pressed="false">下肢冰冷/無脈</button>
+    <button class="chip danger" aria-pressed="false">肢體無力/偏癱</button>
+    <button class="chip danger" aria-pressed="false">腹痛</button>
+    <button class="chip danger" aria-pressed="false">ECG ST變化</button>
+  </div>
+  <div class="row"><input type="text" id="malp_other" class="w-full" placeholder="其他灌流不良"></div>
+</fieldset>
+
+<fieldset>
+  <legend>檢驗</legend>
+  <div class="row"><label>Lactate</label><input type="number" id="lactate" class="w-num" step="0.1" inputmode="decimal"><label>mmol/L</label></div>
+</fieldset>
+
+<fieldset>
+  <legend>目前處置</legend>
+  <div class="chips" data-group="tx">
+    <button class="chip" aria-pressed="false">Trandate</button><button class="chip" aria-pressed="false">Nicardipine</button>
+    <button class="chip" aria-pressed="false">止痛</button>
+  </div>
+  <p class="hint">有用抗凝血 / 抗血小板藥物</p>
+  <div class="chips">
+    <button class="chip danger" data-group="ac" data-single="1" aria-pressed="false">有</button>
+    <button class="chip" data-group="ac" data-single="1" aria-pressed="false">無</button>
+  </div>
+  <div id="acBox" hidden>
+    <div class="chips" data-group="acdrug">
+      <button class="chip" aria-pressed="false">Heparin</button><button class="chip" aria-pressed="false">Warfarin</button>
+      <button class="chip" aria-pressed="false">Brilinta</button><button class="chip" aria-pressed="false">Prasugrel</button>
+      <button class="chip" aria-pressed="false">Aspirin</button><button class="chip" aria-pressed="false">Plavix</button>
+      <button class="chip" aria-pressed="false">tPA</button>
+    </div>
+    <div class="row"><input type="text" id="ac_other" class="w-full" placeholder="其他藥物"></div>
+  </div>
+</fieldset>
+
+<fieldset>
+  <legend>病史</legend>
+  <div class="chips" data-group="hx">
+    <button class="chip" aria-pressed="false">高血壓</button><button class="chip" aria-pressed="false">糖尿病</button>
+    <button class="chip" aria-pressed="false">洗腎</button><button class="chip" aria-pressed="false">中風</button>
+    <button class="chip" aria-pressed="false">心臟手術</button>
+  </div>
+  <div class="row"><input type="text" id="hx_other" class="w-full" placeholder="其他病史"></div>
+</fieldset>
+
+<fieldset>
+  <legend>已上傳</legend>
+  <div class="chips" data-group="up">
+    <button class="chip" aria-pressed="false">CTA 影片</button>
+  </div>
+</fieldset>
+
+<fieldset style="border:0">
+  <legend>訊息預覽（可直接修改）</legend>
+  <textarea id="preview" readonly></textarea>
+  <p id="status"></p>
+</fieldset>
+</main>
+
+<div class="bar">
+  <button class="btn primary" id="copyBtn">複製訊息</button>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const chips = [...document.querySelectorAll('.chip')];
+
+chips.forEach(b => b.addEventListener('click', () => {
+  const on = b.getAttribute('aria-pressed') !== 'true';
+  const g = b.dataset.group || b.parentElement.dataset.group;
+  if (b.dataset.single && on) {
+    chips.filter(x => (x.dataset.group || x.parentElement.dataset.group) === g).forEach(x => x.setAttribute('aria-pressed','false'));
+  }
+  if (g === 'malp_none' && on) chips.filter(x => x.parentElement.dataset.group === 'malp' && x !== b).forEach(x => x.setAttribute('aria-pressed','false'));
+  if (b.parentElement.dataset.group === 'malp' && g !== 'malp_none' && on) chips.filter(x => x.dataset.group === 'malp_none').forEach(x => x.setAttribute('aria-pressed','false'));
+  b.setAttribute('aria-pressed', on);
+  const ac = pressed('ac')[0];
+  $('acBox').hidden = ac !== '有';
+  if (ac !== '有') { chips.filter(x=>x.parentElement.dataset.group==='acdrug').forEach(x=>x.setAttribute('aria-pressed','false')); $('ac_other').value=''; }
+  render();
+}));
+document.querySelectorAll('input,select').forEach(el => el.addEventListener('input', render));
+
+const pressed = g => chips.filter(x => (x.dataset.group || x.parentElement.dataset.group) === g && x.getAttribute('aria-pressed')==='true').map(x => x.textContent.trim());
+const fmt = v => { if(!v) return ''; const d = new Date(v); return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
+const join = a => a.length ? a.map(x=>'☑'+x).join(' ') : '—';
+
+function collect(){
+  const now = new Date();
+  return {
+    通報時間: `${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`,
+    轉出醫院: $('hospital').value, 通報者: $('reporter').value,
+    姓名: $('name').value, ID: $('pid').value, 年齡: $('age').value, 性別: pressed('sex')[0]||'',
+    症狀發生: fmt($('t_onset').value), 到院: fmt($('t_arrive').value), CTA完成: $('t_cta').value,
+    主訴: [...pressed('cc'), $('cc_other').value].filter(Boolean).join('、'),
+    意識: pressed('conscious')[0]||'', 已插管: pressed('intub').length?'是':'否',
+    GCS: [$('gcs_e').value,$('gcs_v').value,$('gcs_m').value].some(Boolean) ? `E${$('gcs_e').value||'?'}V${$('gcs_v').value||'?'}M${$('gcs_m').value||'?'}` : '',
+    SBP: $('sbp').value, DBP: $('dbp').value, HR: $('hr').value, SpO2: $('spo2').value,
+    雙側血壓不同: pressed('bpdiff').length?'是':'否',
+    Type: pressed('type')[0]||'', Hemopericardium: pressed('hemo')[0]||'',
+    灌流不良: [...pressed('malp_none'), ...pressed('malp'), $('malp_other').value].filter(Boolean).join('、'),
+    Lactate: $('lactate').value,
+    處置: pressed('tx').join('、'),
+    抗凝血藥物: pressed('ac')[0]||'',
+    抗凝血藥物品項: pressed('ac')[0]==='有' ? [...pressed('acdrug'), $('ac_other').value].filter(Boolean).join('、') : '',
+    病史: [...pressed('hx'), $('hx_other').value].filter(Boolean).join('、'),
+    已上傳: pressed('up').join('、')
+  };
+}
+
+function message(d){
+  const L = [];
+  L.push(`【轉診通報】${d.轉出醫院||'（醫院）'} ${d.通報者}`.trim());
+  L.push(`姓名 ${d.姓名||'—'}　${d.年齡||'—'}歲 ${d.性別||''}`.trim());
+  L.push(`ID ${d.ID||'—'}`);
+  L.push(`症狀 ${d.症狀發生||'—'}｜到院 ${d.到院||'—'}｜CTA ${d.CTA完成||'—'}`);
+  L.push(`主訴 ${d.主訴||'—'}`);
+  L.push(`意識 ${d.意識||'—'}${d.GCS?' GCS '+d.GCS:''}${d.已插管==='是'?' ☑已插管':''}`);
+  L.push(`BP ${d.SBP||'—'}/${d.DBP||'—'} HR ${d.HR||'—'} SpO2 ${d.SpO2||'—'}%${d.雙側血壓不同==='是'?' ☑雙側血壓不同':''}`);
+  L.push(`CTA ${d.Type?'☑'+d.Type:'—'}｜Hemopericardium ${d.Hemopericardium?'☑'+d.Hemopericardium:'—'}`);
+  L.push(`灌流不良 ${d.灌流不良?d.灌流不良.split('、').map(x=>'☑'+x).join(' '):'—'}`);
+  L.push(`Lactate ${d.Lactate||'—'}`);
+  L.push(`處置 ${d.處置?d.處置.split('、').map(x=>'☑'+x).join(' '):'—'}`);
+  L.push(`抗凝血藥物 ${d.抗凝血藥物?'☑'+d.抗凝血藥物:'—'}${d.抗凝血藥物品項?'：'+d.抗凝血藥物品項:''}`);
+  L.push(`病史 ${d.病史?d.病史.split('、').map(x=>'☑'+x).join(' '):'—'}`);
+  L.push(`已上傳 ${d.已上傳?d.已上傳.split('、').map(x=>'☑'+x).join(' '):'—'}`);
+  L.push(`通報 ${d.通報時間}`);
+  return L.join('\n');
+}
+
+function render(){ $('preview').value = message(collect()); }
+render();
+
+function setStatus(t,c){ const s=$('status'); s.textContent=t; s.className=c; }
+
+$('copyBtn').addEventListener('click', async () => {
+  render();
+  const text = $('preview').value;
+  try{
+    await navigator.clipboard.writeText(text);
+    setStatus('✓ 已複製，切到 LINE 群組長按貼上即可','ok');
+  }catch(e){
+    const ta = $('preview'); ta.removeAttribute('readonly'); ta.focus(); ta.select();
+    try{ document.execCommand('copy'); setStatus('✓ 已複製，切到 LINE 群組長按貼上即可','ok'); }
+    catch(_){ setStatus('無法自動複製，請長按下方訊息框全選複製','err'); }
+    ta.setAttribute('readonly','');
+  }
+});
+</script>
+</body>
+</html>
