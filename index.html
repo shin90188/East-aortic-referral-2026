@@ -62,13 +62,26 @@
 <fieldset>
   <legend>轉出醫院</legend>
   <div class="row">
-    <select id="hospital" class="w-half">
-      <option value="">選擇醫院</option>
-      <option>花蓮慈濟</option><option>花蓮門諾</option><option>部立花蓮</option><option>部立玉里</option>
-      <option>台東馬偕</option><option>部立台東</option><option>台東基督教</option><option>關山慈濟</option><option>玉里慈濟</option>
-      <option>其他</option>
+    <select id="hospital" class="w-full">
+      <option value="">選擇轉出醫院</option>
+      <option>佛教慈濟醫療財團法人花蓮慈濟醫院</option>
+      <option>佛教慈濟醫療財團法人玉里慈濟醫院</option>
+      <option>衛生福利部花蓮醫院</option>
+      <option>衛生福利部花蓮醫院豐濱原住民分院</option>
+      <option>國軍花蓮總醫院</option>
+      <option>臺灣基督教門諾會醫療財團法人門諾醫院</option>
+      <option>臺灣基督教門諾會醫療財團法人門諾醫院壽豐分院</option>
+      <option>臺北榮民總醫院玉里分院</option>
+      <option>臺北榮民總醫院鳳林分院</option>
+      <option>衛生福利部玉里醫院</option>
+      <option>衛生福利部台東醫院</option>
+      <option>衛生福利部台東醫院成功分院</option>
+      <option>馬偕紀念醫院台東分院</option>
+      <option>台東基督教醫院</option>
+      <option>臺北榮民總醫院台東分院</option>
+      <option>台東聖母醫院</option>
+      <option>佛教慈濟醫療財團法人關山慈濟醫院</option>
     </select>
-    <input type="text" id="reporter" class="w-half" placeholder="通報醫師／電話">
   </div>
 </fieldset>
 
@@ -243,7 +256,7 @@ function collect(){
   const now = new Date();
   return {
     通報時間: `${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`,
-    轉出醫院: $('hospital').value, 通報者: $('reporter').value,
+    轉出醫院: $('hospital').value,
     姓名: $('name').value, ID: $('pid').value, 年齡: $('age').value, 性別: pressed('sex')[0]||'',
     症狀發生: fmt($('t_onset').value), 到院: fmt($('t_arrive').value), CTA完成: $('t_cta').value,
     主訴: [...pressed('cc'), $('cc_other').value].filter(Boolean).join('、'),
@@ -265,7 +278,7 @@ function collect(){
 
 function message(d){
   const L = [];
-  L.push(`【轉診通報】${d.轉出醫院||'（醫院）'} ${d.通報者}`.trim());
+  L.push(`【轉診通報】${d.轉出醫院||'（醫院）'}`);
   L.push(`姓名 ${d.姓名||'—'}　${d.年齡||'—'}歲 ${d.性別||''}`.trim());
   L.push(`ID ${d.ID||'—'}`);
   L.push(`症狀 ${d.症狀發生||'—'}｜到院 ${d.到院||'—'}｜CTA ${d.CTA完成||'—'}`);
